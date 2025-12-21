@@ -26,11 +26,12 @@ import { Switch } from "@/components/ui/switch"
 const API_URL = ""
 
 export default function ProjectsPage() {
-  const { data, updateData } = usePortfolio()
+  const { data, saveProject, deleteProject } = usePortfolio()
   const { toast } = useToast()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -93,23 +94,28 @@ export default function ProjectsPage() {
   }
 
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSaving(true)
 
-    if (editingProject) {
-      const updated = data.projects.map((p) => (p.id === editingProject.id ? { ...formData, id: p.id } : p))
-      updateData({ ...data, projects: updated })
-      toast({ title: "Project updated successfully" })
-    } else {
-      const newProject = { ...formData, id: Date.now().toString() }
-      updateData({ ...data, projects: [...data.projects, newProject] })
-      toast({ title: "Project added successfully" })
+    try {
+      if (editingProject) {
+        await saveProject({ ...formData, id: editingProject.id }, false)
+        toast({ title: "Project updated successfully" })
+      } else {
+        await saveProject({ ...formData, id: "" } as Project, true)
+        toast({ title: "Project added successfully" })
+      }
+
+      setDialogOpen(false)
+      setEditingProject(null)
+      setFormData(emptyProject)
+      setImagePreview(null)
+    } catch (error) {
+      toast({ title: "Failed to save project", variant: "destructive" })
+    } finally {
+      setSaving(false)
     }
-
-    setDialogOpen(false)
-    setEditingProject(null)
-    setFormData(emptyProject)
-    setImagePreview(null)
   }
 
   const handleEdit = (project: Project) => {
@@ -119,9 +125,13 @@ export default function ProjectsPage() {
     setDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    updateData({ ...data, projects: data.projects.filter((p) => p.id !== id) })
-    toast({ title: "Project deleted successfully" })
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteProject(id)
+      toast({ title: "Project deleted successfully" })
+    } catch (error) {
+      toast({ title: "Failed to delete project", variant: "destructive" })
+    }
   }
 
   const handleAddNew = () => {
@@ -290,7 +300,8 @@ export default function ProjectsPage() {
                 <Label htmlFor="featured">Featured Project</Label>
               </div>
 
-              <Button type="submit" className="w-full" disabled={uploading}>
+              <Button type="submit" className="w-full" disabled={uploading || saving}>
+                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {editingProject ? "Update Project" : "Add Project"}
               </Button>
             </form>

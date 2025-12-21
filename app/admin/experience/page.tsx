@@ -19,15 +19,16 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { Plus, Edit, Trash2, Briefcase, CheckCircle2 } from "lucide-react"
+import { Plus, Edit, Trash2, Briefcase, CheckCircle2, Loader2 } from "lucide-react"
 import type { Experience } from "@/lib/types"
 import { Switch } from "@/components/ui/switch"
 
 export default function ExperiencePage() {
-  const { data, updateData } = usePortfolio()
+  const { data, saveExperience, deleteExperience } = usePortfolio()
   const { toast } = useToast()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null)
+  const [saving, setSaving] = useState(false)
 
   const emptyExperience: Omit<Experience, "id"> = {
     company: "",
@@ -40,24 +41,27 @@ export default function ExperiencePage() {
 
   const [formData, setFormData] = useState(emptyExperience)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSaving(true)
 
-    if (editingExperience) {
-      const updated = data.experience.map((exp) =>
-        exp.id === editingExperience.id ? { ...formData, id: exp.id } : exp,
-      )
-      updateData({ ...data, experience: updated })
-      toast({ title: "Experience updated successfully" })
-    } else {
-      const newExperience = { ...formData, id: Date.now().toString() }
-      updateData({ ...data, experience: [...data.experience, newExperience] })
-      toast({ title: "Experience added successfully" })
+    try {
+      if (editingExperience) {
+        await saveExperience({ ...formData, id: editingExperience.id }, false)
+        toast({ title: "Experience updated successfully" })
+      } else {
+        await saveExperience({ ...formData, id: "" } as Experience, true)
+        toast({ title: "Experience added successfully" })
+      }
+
+      setDialogOpen(false)
+      setEditingExperience(null)
+      setFormData(emptyExperience)
+    } catch (error) {
+      toast({ title: "Failed to save experience", variant: "destructive" })
+    } finally {
+      setSaving(false)
     }
-
-    setDialogOpen(false)
-    setEditingExperience(null)
-    setFormData(emptyExperience)
   }
 
   const handleEdit = (experience: Experience) => {
@@ -66,9 +70,13 @@ export default function ExperiencePage() {
     setDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    updateData({ ...data, experience: data.experience.filter((exp) => exp.id !== id) })
-    toast({ title: "Experience deleted successfully" })
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteExperience(id)
+      toast({ title: "Experience deleted successfully" })
+    } catch (error) {
+      toast({ title: "Failed to delete experience", variant: "destructive" })
+    }
   }
 
   const handleAddNew = () => {
@@ -168,7 +176,8 @@ export default function ExperiencePage() {
                 <Label htmlFor="current">Current Position</Label>
               </div>
 
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={saving}>
+                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {editingExperience ? "Update Experience" : "Add Experience"}
               </Button>
             </form>

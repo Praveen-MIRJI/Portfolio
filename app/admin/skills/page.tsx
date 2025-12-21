@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast"
 import {
   Plus, Edit, Trash2, X, Code2, Database, Wrench, Palette, Globe, Server,
   GitBranch, Figma, Layers, Cpu, Cloud, Terminal, Smartphone, Boxes,
-  FileCode, Braces, Hash, Workflow, Container, Sparkles
+  FileCode, Braces, Hash, Workflow, Container, Sparkles, Loader2
 } from "lucide-react"
 import type { SkillCategory } from "@/lib/types"
 import type { LucideIcon } from "lucide-react"
@@ -54,11 +54,12 @@ const iconMap: Record<string, LucideIcon> = Object.fromEntries(
 )
 
 export default function SkillsPage() {
-  const { data, updateData } = usePortfolio()
+  const { data, saveSkillCategory, deleteSkillCategory } = usePortfolio()
   const { toast } = useToast()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<SkillCategory | null>(null)
   const [newSkill, setNewSkill] = useState("")
+  const [saving, setSaving] = useState(false)
 
   const emptyCategory: Omit<SkillCategory, "id"> = {
     key: "frontend",
@@ -70,26 +71,27 @@ export default function SkillsPage() {
 
   const [formData, setFormData] = useState<Omit<SkillCategory, "id">>(emptyCategory)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSaving(true)
 
-    const categories = data.skillCategories || []
+    try {
+      if (editingCategory) {
+        await saveSkillCategory({ ...formData, id: editingCategory.id }, false)
+        toast({ title: "Category updated successfully" })
+      } else {
+        await saveSkillCategory({ ...formData, id: "" } as SkillCategory, true)
+        toast({ title: "Category added successfully" })
+      }
 
-    if (editingCategory) {
-      const updated = categories.map((c) => 
-        c.id === editingCategory.id ? { ...formData, id: c.id } : c
-      )
-      updateData({ ...data, skillCategories: updated })
-      toast({ title: "Category updated successfully" })
-    } else {
-      const newCategory = { ...formData, id: Date.now().toString() }
-      updateData({ ...data, skillCategories: [...categories, newCategory] })
-      toast({ title: "Category added successfully" })
+      setDialogOpen(false)
+      setEditingCategory(null)
+      setFormData(emptyCategory)
+    } catch (error) {
+      toast({ title: "Failed to save category", variant: "destructive" })
+    } finally {
+      setSaving(false)
     }
-
-    setDialogOpen(false)
-    setEditingCategory(null)
-    setFormData(emptyCategory)
   }
 
   const handleEdit = (category: SkillCategory) => {
@@ -98,10 +100,13 @@ export default function SkillsPage() {
     setDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    const categories = data.skillCategories || []
-    updateData({ ...data, skillCategories: categories.filter((c) => c.id !== id) })
-    toast({ title: "Category deleted successfully" })
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteSkillCategory(id)
+      toast({ title: "Category deleted successfully" })
+    } catch (error) {
+      toast({ title: "Failed to delete category", variant: "destructive" })
+    }
   }
 
   const handleAddNew = () => {
@@ -237,7 +242,8 @@ export default function SkillsPage() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={saving}>
+                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {editingCategory ? "Update Category" : "Add Category"}
               </Button>
             </form>

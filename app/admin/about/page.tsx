@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Save, Upload, X, Loader2 } from "lucide-react"
 import Image from "next/image"
@@ -15,19 +15,35 @@ import Image from "next/image"
 const API_URL = ""
 
 export default function AboutPage() {
-  const { data, updateData } = usePortfolio()
+  const { data, saveAbout } = usePortfolio()
   const { toast } = useToast()
   const [formData, setFormData] = useState(data.about)
   const [uploading, setUploading] = useState(false)
+  const [saving, setSaving] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    setFormData(data.about)
+  }, [data.about])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    updateData({ ...data, about: formData })
-    toast({
-      title: "Profile updated",
-      description: "Your profile information has been saved successfully.",
-    })
+    setSaving(true)
+    try {
+      await saveAbout(formData)
+      toast({
+        title: "Profile updated",
+        description: "Your profile information has been saved successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Failed to save",
+        description: "Could not save profile information.",
+        variant: "destructive",
+      })
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -268,9 +284,9 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full md:w-auto gap-2">
-              <Save className="w-4 h-4" />
-              Save Changes
+            <Button type="submit" className="w-full md:w-auto gap-2" disabled={saving}>
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? "Saving..." : "Save Changes"}
             </Button>
           </CardContent>
         </Card>
