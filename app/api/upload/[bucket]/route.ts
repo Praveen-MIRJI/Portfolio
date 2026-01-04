@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase"
 
 const allowedBuckets = [
   "profile-image",
-  "project-images", 
+  "project-images",
   "experience-images",
   "service-images",
   "general-images"
@@ -54,6 +54,12 @@ export async function POST(
     const { data: urlData } = supabase.storage
       .from(bucket)
       .getPublicUrl(uniqueName)
+
+    console.log("Upload Debug:", {
+      bucket,
+      uniqueName,
+      publicUrl: urlData.publicUrl
+    })
 
     return NextResponse.json({
       url: urlData.publicUrl,

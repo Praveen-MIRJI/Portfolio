@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils"
 
 export function ProjectsSection() {
   const { data } = usePortfolio()
+
+  console.log("Projects Debug:", data.projects.map(p => ({ title: p.title, image: p.image })))
+
   const featuredProjects = data.projects.filter((p) => p.featured)
   const otherProjects = data.projects.filter((p) => !p.featured)
 
