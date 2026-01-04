@@ -120,6 +120,14 @@ function FeaturedProjectCard({ project, index = 0 }: ProjectProps) {
             alt={project.title}
             fill
             className={cn("object-cover transition-transform duration-500", isHovered && "scale-105")}
+            unoptimized={project.image?.startsWith('http')}
+            onError={(e) => {
+              console.error('Featured project image failed to load:', project.image);
+              e.currentTarget.src = '/placeholder.svg';
+            }}
+            onLoad={() => {
+              console.log('Featured project image loaded successfully:', project.image);
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
         </div>
@@ -216,6 +224,14 @@ function OtherProjectCard({ project }: ProjectProps) {
             alt={project.title}
             fill
             className={cn("object-cover transition-transform duration-500", isHovered && "scale-105")}
+            unoptimized={project.image?.startsWith('http')}
+            onError={(e) => {
+              console.error('Other project image failed to load:', project.image);
+              e.currentTarget.src = '/placeholder.svg';
+            }}
+            onLoad={() => {
+              console.log('Other project image loaded successfully:', project.image);
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
 

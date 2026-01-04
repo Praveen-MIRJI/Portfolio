@@ -23,7 +23,7 @@ import Image from "next/image"
 import type { Project } from "@/lib/types"
 import { Switch } from "@/components/ui/switch"
 
-const API_URL = ""
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ""
 
 export default function ProjectsPage() {
   const { data, saveProject, deleteProject } = usePortfolio()
@@ -65,7 +65,7 @@ export default function ProjectsPage() {
         const base64 = reader.result as string
         setImagePreview(base64)
 
-        const res = await fetch(`${API_URL}/api/upload/project-images`, {
+        const res = await fetch(`/api/upload/project-images`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -313,7 +313,20 @@ export default function ProjectsPage() {
         {data.projects.map((project) => (
           <Card key={project.id} className="overflow-hidden group">
             <div className="relative h-48 bg-muted">
-              <Image src={project.image || "/placeholder.svg"} alt={project.title} fill className="object-cover" />
+              <Image 
+                src={project.image || "/placeholder.svg"} 
+                alt={project.title} 
+                fill 
+                className="object-cover" 
+                unoptimized={project.image?.startsWith('http')}
+                onError={(e) => {
+                  console.error('Admin project image failed to load:', project.image);
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
+                onLoad={() => {
+                  console.log('Admin project image loaded successfully:', project.image);
+                }}
+              />
               {project.featured && (
                 <Badge className="absolute top-3 right-3 bg-primary">
                   <Star className="w-3 h-3 mr-1" />
