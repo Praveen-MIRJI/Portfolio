@@ -55,12 +55,6 @@ export async function POST(
       .from(bucket)
       .getPublicUrl(uniqueName)
 
-    console.log("Upload Debug:", {
-      bucket,
-      uniqueName,
-      publicUrl: urlData.publicUrl
-    })
-
     return NextResponse.json({
       url: urlData.publicUrl,
       path: data.path,
