@@ -22,8 +22,8 @@ export function AppWrapper({ children }: AppWrapperProps) {
   return (
     <>
       {isLoading && (
-        <LoadingScreen 
-          onLoadingComplete={handleLoadingComplete} 
+        <LoadingScreen
+          onLoadingComplete={handleLoadingComplete}
         />
       )}
       <div className={showContent ? "opacity-100 transition-opacity duration-500" : "opacity-0 pointer-events-none"}>

@@ -2,12 +2,13 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useAuth } from "@/lib/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Lock, Loader2, Eye, EyeOff } from "lucide-react"
+import { Lock, Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react"
 
 export default function LoginPage() {
   const [password, setPassword] = useState("")
@@ -23,13 +24,13 @@ export default function LoginPage() {
     setLoading(true)
 
     const success = await login(password)
-    
+
     if (success) {
       router.push("/admin")
     } else {
       setError("Invalid password. Please try again.")
     }
-    
+
     setLoading(false)
   }
 
@@ -90,6 +91,14 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+          <div className="mt-6 text-center">
+            <Button variant="link" asChild className="text-muted-foreground">
+              <Link href="/">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Landing Page
+              </Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

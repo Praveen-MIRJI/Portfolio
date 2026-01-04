@@ -85,13 +85,13 @@ export function ContactSection() {
             </div>
 
             <div className="flex flex-col gap-6">
-              <ContactInfoCard 
+              <ContactInfoCard
                 icon={Mail}
                 label="Email"
                 value={data.about.email}
                 href={`mailto:${data.about.email}`}
               />
-              <ContactInfoCard 
+              <ContactInfoCard
                 icon={MapPin}
                 label="Location"
                 value={data.about.location}

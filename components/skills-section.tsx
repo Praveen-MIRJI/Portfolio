@@ -4,7 +4,7 @@ import { usePortfolio } from "@/lib/portfolio-context"
 import { Badge } from "@/components/ui/badge"
 import { AnimatedCard } from "@/components/ui/animated-card"
 import {
-  Code2, Database, Wrench, Palette, Globe, Server, GitBranch, 
+  Code2, Database, Wrench, Palette, Globe, Server, GitBranch,
   Figma, Layers, Cpu, Cloud, Terminal, Smartphone, Boxes,
   FileCode, Braces, Hash, Workflow, Container, Sparkles
 } from "lucide-react"
@@ -35,7 +35,7 @@ const iconMap: Record<string, LucideIcon> = {
 
 export function SkillsSection() {
   const { data } = usePortfolio()
-  
+
   const getIcon = (iconName?: string): LucideIcon => {
     return iconMap[iconName?.toLowerCase() || "sparkles"] || Sparkles
   }
@@ -58,7 +58,7 @@ export function SkillsSection() {
         <div className="grid md:grid-cols-2 gap-6">
           {data.skillCategories?.map((category) => {
             const Icon = getIcon(category.icon)
-            
+
             return (
               <AnimatedCard key={category.id} innerClassName="p-8">
                 <div className="relative space-y-6">
@@ -80,8 +80,8 @@ export function SkillsSection() {
                   {/* Skills Tags */}
                   <div className="flex flex-wrap gap-2 pt-2">
                     {category.skills.map((skill, index) => (
-                      <Badge 
-                        key={index} 
+                      <Badge
+                        key={index}
                         variant="secondary"
                         className="px-3 py-1.5 text-sm font-medium"
                       >

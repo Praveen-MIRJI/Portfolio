@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { 
-  Brain, 
-  MessageSquareText, 
-  Bot, 
-  Globe, 
-  Smartphone, 
+import {
+  Brain,
+  MessageSquareText,
+  Bot,
+  Globe,
+  Smartphone,
   BarChart3,
   ArrowRight,
   Sparkles,
@@ -128,9 +128,9 @@ export function ServicesSection() {
   }, [])
 
   return (
-    <section 
+    <section
       ref={sectionRef}
-      id="services" 
+      id="services"
       className="py-24 px-4 relative overflow-hidden"
     >
       {/* Subtle background */}
@@ -138,10 +138,9 @@ export function ServicesSection() {
 
       <div className="container max-w-7xl mx-auto">
         {/* Header */}
-        <div 
-          className={`text-center mb-16 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
+        <div
+          className={`text-center mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
         >
           <Badge variant="outline" className="mb-4 px-4 py-1.5">
             <Sparkles className="w-3 h-3 mr-1.5" />
@@ -161,9 +160,9 @@ export function ServicesSection() {
         {/* Services Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
           {services.map((service, index) => (
-            <ServiceCard 
-              key={service.title} 
-              service={service} 
+            <ServiceCard
+              key={service.title}
+              service={service}
               index={index}
               isVisible={isVisible}
             />
@@ -171,15 +170,14 @@ export function ServicesSection() {
         </div>
 
         {/* CTA Section */}
-        <div 
-          className={`transition-all duration-700 delay-500 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
+        <div
+          className={`transition-all duration-700 delay-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
         >
           <div className="relative rounded-2xl border border-border bg-card/50 backdrop-blur-sm p-8 md:p-12 text-center overflow-hidden">
             {/* Subtle gradient background */}
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5" />
-            
+
             <div className="relative">
               <h3 className="text-2xl md:text-3xl font-bold mb-4">
                 Have an idea?{" "}
@@ -219,11 +217,10 @@ function ServiceCard({ service, index, isVisible }: ServiceCardProps) {
 
   return (
     <div
-      className={`transition-all duration-700 ${
-        isVisible 
-          ? "opacity-100 translate-y-0" 
+      className={`transition-all duration-700 ${isVisible
+          ? "opacity-100 translate-y-0"
           : "opacity-0 translate-y-10"
-      }`}
+        }`}
       style={{ transitionDelay: `${index * 100}ms` }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -231,34 +228,29 @@ function ServiceCard({ service, index, isVisible }: ServiceCardProps) {
       <div className="relative h-full rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-lg">
         {/* Animated border line */}
         <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
-          <div 
-            className={`absolute top-0 left-0 h-[2px] bg-gradient-to-r from-primary to-accent transition-all duration-500 ease-out ${
-              isHovered ? "w-full" : "w-0"
-            }`}
+          <div
+            className={`absolute top-0 left-0 h-[2px] bg-gradient-to-r from-primary to-accent transition-all duration-500 ease-out ${isHovered ? "w-full" : "w-0"
+              }`}
           />
-          <div 
-            className={`absolute top-0 right-0 w-[2px] bg-gradient-to-b from-accent to-primary transition-all duration-500 ease-out delay-100 ${
-              isHovered ? "h-full" : "h-0"
-            }`}
+          <div
+            className={`absolute top-0 right-0 w-[2px] bg-gradient-to-b from-accent to-primary transition-all duration-500 ease-out delay-100 ${isHovered ? "h-full" : "h-0"
+              }`}
           />
-          <div 
-            className={`absolute bottom-0 right-0 h-[2px] bg-gradient-to-l from-primary to-accent transition-all duration-500 ease-out delay-200 ${
-              isHovered ? "w-full" : "w-0"
-            }`}
+          <div
+            className={`absolute bottom-0 right-0 h-[2px] bg-gradient-to-l from-primary to-accent transition-all duration-500 ease-out delay-200 ${isHovered ? "w-full" : "w-0"
+              }`}
           />
-          <div 
-            className={`absolute bottom-0 left-0 w-[2px] bg-gradient-to-t from-accent to-primary transition-all duration-500 ease-out delay-300 ${
-              isHovered ? "h-full" : "h-0"
-            }`}
+          <div
+            className={`absolute bottom-0 left-0 w-[2px] bg-gradient-to-t from-accent to-primary transition-all duration-500 ease-out delay-300 ${isHovered ? "h-full" : "h-0"
+              }`}
           />
         </div>
 
         <div className="relative space-y-4">
           {/* Icon */}
-          <div 
-            className={`w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-all duration-300 ${
-              isHovered ? "bg-primary/20 scale-110" : ""
-            }`}
+          <div
+            className={`w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-all duration-300 ${isHovered ? "bg-primary/20 scale-110" : ""
+              }`}
           >
             <Icon className={`w-6 h-6 text-primary transition-transform duration-300 ${isHovered ? "scale-110" : ""}`} />
           </div>
@@ -276,9 +268,9 @@ function ServiceCard({ service, index, isVisible }: ServiceCardProps) {
           {/* Tech Stack Tags */}
           <div className="flex flex-wrap gap-2 pt-2">
             {service.tags.map((tag) => (
-              <Badge 
-                key={tag} 
-                variant="secondary" 
+              <Badge
+                key={tag}
+                variant="secondary"
                 className="text-xs font-normal"
               >
                 {tag}
