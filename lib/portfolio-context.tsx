@@ -183,7 +183,12 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(experience),
     })
-    if (!response.ok) throw new Error("Failed to save experience")
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.details || errorData.error || "Failed to save experience")
+    }
+    
     const savedExperience = await response.json()
     
     setData(prev => ({

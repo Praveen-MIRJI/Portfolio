@@ -19,15 +19,27 @@ export async function POST(request: NextRequest) {
   try {
     const expData = await request.json()
 
+    // Remove id field if it exists and is empty, and ensure achievements is an array
+    const { id, ...processedData } = {
+      ...expData,
+      achievements: Array.isArray(expData.achievements) ? expData.achievements : []
+    }
+
     const { data, error } = await supabase
       .from("experience")
-      .insert(expData)
+      .insert(processedData)
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      throw error
+    }
+    
     return NextResponse.json(data, { status: 201 })
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to create experience" }, { status: 500 })
+  } catch (error: any) {
+    return NextResponse.json({ 
+      error: "Failed to create experience", 
+      details: error.message 
+    }, { status: 500 })
   }
 }

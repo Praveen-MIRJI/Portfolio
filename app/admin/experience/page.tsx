@@ -50,15 +50,21 @@ export default function ExperiencePage() {
         await saveExperience({ ...formData, id: editingExperience.id }, false)
         toast({ title: "Experience updated successfully" })
       } else {
-        await saveExperience({ ...formData, id: "" } as Experience, true)
+        // Don't include id field when creating new experience
+        const { id, ...newExperienceData } = { ...formData, id: "" }
+        await saveExperience(newExperienceData as Experience, true)
         toast({ title: "Experience added successfully" })
       }
 
       setDialogOpen(false)
       setEditingExperience(null)
       setFormData(emptyExperience)
-    } catch (error) {
-      toast({ title: "Failed to save experience", variant: "destructive" })
+    } catch (error: any) {
+      toast({ 
+        title: "Failed to save experience", 
+        description: error.message || "Unknown error occurred",
+        variant: "destructive" 
+      })
     } finally {
       setSaving(false)
     }
