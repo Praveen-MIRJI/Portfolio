@@ -40,6 +40,24 @@ export async function POST(
     const ext = fileName.split(".").pop() || "jpg"
     const uniqueName = `${bucket.replace("-images", "").replace("-image", "")}-${Date.now()}.${ext}`
 
+    // Ensure bucket exists and is public
+    const { data: bucketData, error: bucketError } = await supabase.storage.getBucket(bucket)
+
+    if (bucketError) {
+      console.log(`Bucket ${bucket} not found, attempting to create...`)
+      const { error: createError } = await supabase.storage.createBucket(bucket, {
+        public: true,
+        fileSizeLimit: 5242880,
+        allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+      })
+      if (createError) {
+        console.error("Failed to create bucket:", createError)
+        // Continue anyway, maybe it exists but getBucket failed?
+      } else {
+        console.log(`Bucket ${bucket} created successfully`)
+      }
+    }
+
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from(bucket)
