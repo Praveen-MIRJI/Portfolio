@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
+import { deleteImageFromStorage, getBucketName } from "@/lib/image-utils"
 
 // Convert snake_case DB fields to camelCase for frontend
 function toFrontend(data: any) {
@@ -50,6 +51,20 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const aboutData = await request.json()
+    
+    // Get the current record to check for existing profile image
+    const { data: currentData, error: fetchError } = await supabase
+      .from("about")
+      .select("profile_image")
+      .single()
+    
+    // If there's a new profile image and an old one exists, delete the old one
+    if (aboutData.profileImage && currentData?.profile_image && 
+        aboutData.profileImage !== currentData.profile_image) {
+      const bucket = getBucketName('profile')
+      await deleteImageFromStorage(currentData.profile_image, bucket)
+    }
+    
     const dbData = toDatabase(aboutData)
 
     const { data, error } = await supabase

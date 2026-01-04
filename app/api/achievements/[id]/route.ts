@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
+import { deleteImageFromStorage, getBucketName } from "@/lib/image-utils"
 
 // Convert from DB to frontend
 function toFrontend(data: any) {
@@ -31,6 +32,22 @@ export async function PUT(
     try {
         const { id } = await params
         const json = await request.json()
+        
+        // Get the current record to check for existing image
+        const { data: currentData, error: fetchError } = await supabase
+            .from("achievements")
+            .select("image")
+            .eq("id", id)
+            .single()
+        
+        if (fetchError) throw fetchError
+        
+        // If there's a new image and an old image exists, delete the old one
+        if (json.image && currentData.image && json.image !== currentData.image) {
+            const bucket = getBucketName('achievements')
+            await deleteImageFromStorage(currentData.image, bucket)
+        }
+        
         const dbData = toDatabase(json)
 
         const { data, error } = await supabase
@@ -54,6 +71,22 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params
+        
+        // Get the current record to delete associated image
+        const { data: currentData, error: fetchError } = await supabase
+            .from("achievements")
+            .select("image")
+            .eq("id", id)
+            .single()
+        
+        if (fetchError) throw fetchError
+        
+        // Delete the image from storage if it exists
+        if (currentData.image) {
+            const bucket = getBucketName('achievements')
+            await deleteImageFromStorage(currentData.image, bucket)
+        }
+        
         const { error } = await supabase.from("achievements").delete().eq("id", id)
 
         if (error) throw error
