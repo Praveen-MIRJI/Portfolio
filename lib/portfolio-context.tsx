@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
-import type { PortfolioData, AboutData as About, Project, Skill, SkillCategory, Service, Experience } from "./types"
+import type { PortfolioData, AboutData as About, Project, Skill, SkillCategory, Service, Experience, Achievement } from "./types"
 import { initialPortfolioData } from "./portfolio-data"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ""
@@ -21,6 +21,8 @@ interface PortfolioContextType {
   deleteService: (id: string) => Promise<void>
   saveExperience: (experience: Experience, isNew?: boolean) => Promise<Experience>
   deleteExperience: (id: string) => Promise<void>
+  saveAchievement: (achievement: Achievement, isNew?: boolean) => Promise<Achievement>
+  deleteAchievement: (id: string) => Promise<void>
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined)
@@ -41,6 +43,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
           skillCategories: portfolioData.skillCategories || initialPortfolioData.skillCategories,
           services: portfolioData.services || initialPortfolioData.services,
           experience: portfolioData.experience || initialPortfolioData.experience,
+          achievements: portfolioData.achievements || initialPortfolioData.achievements,
         }
         setData(mergedData)
         localStorage.setItem("portfolio-data", JSON.stringify(mergedData))
@@ -90,7 +93,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const saveProject = async (project: Project, isNew = false): Promise<Project> => {
     const method = isNew ? "POST" : "PUT"
     const url = isNew ? `${API_URL}/api/projects` : `${API_URL}/api/projects/${project.id}`
-    
+
     const response = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -98,10 +101,10 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     })
     if (!response.ok) throw new Error("Failed to save project")
     const savedProject = await response.json()
-    
+
     setData(prev => ({
       ...prev,
-      projects: isNew 
+      projects: isNew
         ? [...prev.projects, savedProject]
         : prev.projects.map(p => p.id === savedProject.id ? savedProject : p)
     }))
@@ -119,7 +122,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const saveSkillCategory = async (category: SkillCategory, isNew = false): Promise<SkillCategory> => {
     const method = isNew ? "POST" : "PUT"
     const url = isNew ? `${API_URL}/api/skill-categories` : `${API_URL}/api/skill-categories/${category.id}`
-    
+
     const response = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -127,7 +130,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     })
     if (!response.ok) throw new Error("Failed to save skill category")
     const savedCategory = await response.json()
-    
+
     setData(prev => ({
       ...prev,
       skillCategories: isNew
@@ -148,7 +151,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const saveService = async (service: Service, isNew = false): Promise<Service> => {
     const method = isNew ? "POST" : "PUT"
     const url = isNew ? `${API_URL}/api/services` : `${API_URL}/api/services/${service.id}`
-    
+
     const response = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -156,7 +159,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     })
     if (!response.ok) throw new Error("Failed to save service")
     const savedService = await response.json()
-    
+
     setData(prev => ({
       ...prev,
       services: isNew
@@ -177,20 +180,20 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const saveExperience = async (experience: Experience, isNew = false): Promise<Experience> => {
     const method = isNew ? "POST" : "PUT"
     const url = isNew ? `${API_URL}/api/experience` : `${API_URL}/api/experience/${experience.id}`
-    
+
     const response = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(experience),
     })
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       throw new Error(errorData.details || errorData.error || "Failed to save experience")
     }
-    
+
     const savedExperience = await response.json()
-    
+
     setData(prev => ({
       ...prev,
       experience: isNew
@@ -207,11 +210,45 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     setData(prev => ({ ...prev, experience: prev.experience.filter(e => e.id !== id) }))
   }
 
+  // Save Achievement
+  const saveAchievement = async (achievement: Achievement, isNew = false): Promise<Achievement> => {
+    const method = isNew ? "POST" : "PUT"
+    const url = isNew ? `${API_URL}/api/achievements` : `${API_URL}/api/achievements/${achievement.id}`
+
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(achievement),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.details || errorData.error || "Failed to save achievement")
+    }
+
+    const savedAchievement = await response.json()
+
+    setData(prev => ({
+      ...prev,
+      achievements: isNew
+        ? [...prev.achievements, savedAchievement]
+        : prev.achievements.map(a => a.id === savedAchievement.id ? savedAchievement : a)
+    }))
+    return savedAchievement
+  }
+
+  // Delete Achievement
+  const deleteAchievement = async (id: string) => {
+    const response = await fetch(`${API_URL}/api/achievements/${id}`, { method: "DELETE" })
+    if (!response.ok) throw new Error("Failed to delete achievement")
+    setData(prev => ({ ...prev, achievements: prev.achievements.filter(a => a.id !== id) }))
+  }
+
   return (
-    <PortfolioContext.Provider value={{ 
-      data, 
-      updateData, 
-      refreshData, 
+    <PortfolioContext.Provider value={{
+      data,
+      updateData,
+      refreshData,
       isLoading,
       saveAbout,
       saveProject,
@@ -222,6 +259,8 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       deleteService,
       saveExperience,
       deleteExperience,
+      saveAchievement,
+      deleteAchievement,
     }}>
       {children}
     </PortfolioContext.Provider>

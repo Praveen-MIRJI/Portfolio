@@ -88,7 +88,7 @@ function FeaturedProjectCard({ project }: ProjectProps) {
     >
       <div
         className={cn(
-          "relative h-full min-h-[500px] rounded-xl overflow-hidden border border-border bg-card transition-all duration-300 hover:border-primary/50 hover:shadow-lg flex flex-col"
+          "relative h-full min-h-[400px] md:min-h-[500px] rounded-xl overflow-hidden border border-border bg-card transition-all duration-300 hover:border-primary/50 hover:shadow-lg flex flex-col"
         )}
       >
         {/* Animated border */}
@@ -152,16 +152,16 @@ function FeaturedProjectCard({ project }: ProjectProps) {
 
           {/* Text Content */}
           <div className="space-y-4">
-            <h3 className="font-bold tracking-tight text-3xl md:text-3xl text-foreground">
+            <h3 className="font-bold tracking-tight text-2xl md:text-3xl text-foreground">
               {project.title}
             </h3>
 
-            <p className="text-muted-foreground leading-relaxed text-base md:text-lg line-clamp-3">
+            <p className="text-muted-foreground leading-relaxed text-base md:text-lg line-clamp-2 md:line-clamp-3">
               {project.longDescription}
             </p>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 pt-2">
+            {/* Tags - Hidden on mobile */}
+            <div className="hidden md:flex flex-wrap gap-2 pt-2">
               {project.tags.map((tag) => (
                 <Badge key={tag} variant="secondary" className="text-xs">
                   {tag}

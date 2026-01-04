@@ -15,14 +15,14 @@ export function CursorFollower() {
 
       // Check if hovering over clickable element
       const target = e.target as HTMLElement
-      const isClickable = 
+      const isClickable =
         target.tagName === "A" ||
         target.tagName === "BUTTON" ||
         target.closest("a") ||
         target.closest("button") ||
         target.closest("[role='button']") ||
         window.getComputedStyle(target).cursor === "pointer"
-      
+
       setIsPointer(isClickable)
     }
 
@@ -56,18 +56,17 @@ export function CursorFollower() {
     return () => cancelAnimationFrame(animationId)
   }, [position])
 
-  // Don't render on touch devices
-  if (typeof window !== "undefined" && "ontouchstart" in window) {
-    return null
-  }
+  // Don't render on touch devices - handled by CSS (hidden md:block) and event listeners not firing
+  // UseEffect for touch detection would cause hydration mismatch if we return null conditionally based on window
+
+  /* Removed: if (typeof window !== "undefined" && "ontouchstart" in window) return null */
 
   return (
     <>
       {/* Main follower circle */}
       <div
-        className={`fixed pointer-events-none z-[9999] transition-opacity duration-300 ${
-          isVisible ? "opacity-100" : "opacity-0"
-        }`}
+        className={`hidden md:block fixed pointer-events-none z-[9999] transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"
+          }`}
         style={{
           left: smoothPosition.x,
           top: smoothPosition.y,
@@ -76,9 +75,8 @@ export function CursorFollower() {
       >
         {/* Outer gradient ring */}
         <div
-          className={`absolute rounded-full transition-all duration-300 ease-out ${
-            isPointer ? "scale-150 opacity-100" : "scale-100 opacity-70"
-          }`}
+          className={`absolute rounded-full transition-all duration-300 ease-out ${isPointer ? "scale-150 opacity-100" : "scale-100 opacity-70"
+            }`}
           style={{
             width: 36,
             height: 36,
@@ -91,9 +89,8 @@ export function CursorFollower() {
 
         {/* Inner dot */}
         <div
-          className={`absolute rounded-full transition-all duration-200 ease-out ${
-            isPointer ? "scale-0" : "scale-100"
-          }`}
+          className={`absolute rounded-full transition-all duration-200 ease-out ${isPointer ? "scale-0" : "scale-100"
+            }`}
           style={{
             width: 8,
             height: 8,
@@ -106,9 +103,8 @@ export function CursorFollower() {
 
         {/* Ring border (shows on hover) */}
         <div
-          className={`absolute rounded-full border-2 border-primary/60 transition-all duration-300 ease-out ${
-            isPointer ? "scale-100 opacity-100" : "scale-50 opacity-0"
-          }`}
+          className={`absolute rounded-full border-2 border-primary/60 transition-all duration-300 ease-out ${isPointer ? "scale-100 opacity-100" : "scale-50 opacity-0"
+            }`}
           style={{
             width: 44,
             height: 44,
@@ -120,9 +116,8 @@ export function CursorFollower() {
 
       {/* Secondary trailing element */}
       <div
-        className={`fixed pointer-events-none z-[9998] transition-opacity duration-500 ${
-          isVisible ? "opacity-60" : "opacity-0"
-        }`}
+        className={`hidden md:block fixed pointer-events-none z-[9998] transition-opacity duration-500 ${isVisible ? "opacity-60" : "opacity-0"
+          }`}
         style={{
           left: smoothPosition.x,
           top: smoothPosition.y,
@@ -130,9 +125,8 @@ export function CursorFollower() {
         }}
       >
         <div
-          className={`rounded-full transition-all duration-500 ease-out ${
-            isPointer ? "scale-[2] opacity-30" : "scale-100 opacity-50"
-          }`}
+          className={`rounded-full transition-all duration-500 ease-out ${isPointer ? "scale-[2] opacity-30" : "scale-100 opacity-50"
+            }`}
           style={{
             width: 60,
             height: 60,

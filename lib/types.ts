@@ -46,6 +46,15 @@ export interface Experience {
   current: boolean
 }
 
+export interface Achievement {
+  id: string
+  title: string
+  description: string
+  image: string
+  date: string
+  credentialUrl?: string
+}
+
 export interface AboutData {
   name: string
   title: string
@@ -66,4 +75,5 @@ export interface PortfolioData {
   skillCategories: SkillCategory[]
   services: Service[]
   experience: Experience[]
+  achievements: Achievement[]
 }

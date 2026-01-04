@@ -189,12 +189,16 @@ export function ServicesSection() {
                 Transform your vision into reality with cutting-edge AI solutions and expert development.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="gap-2">
-                  Get Free Consultation
-                  <ArrowRight className="w-4 h-4" />
+                <Button size="lg" className="gap-2" asChild>
+                  <a href="#contact">
+                    Get Free Consultation
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
                 </Button>
-                <Button size="lg" variant="outline" className="gap-2">
-                  Start a Project
+                <Button size="lg" variant="outline" className="gap-2" asChild>
+                  <a href="#contact">
+                    Start a Project
+                  </a>
                 </Button>
               </div>
             </div>
@@ -218,8 +222,8 @@ function ServiceCard({ service, index, isVisible }: ServiceCardProps) {
   return (
     <div
       className={`transition-all duration-700 ${isVisible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-10"
+        ? "opacity-100 translate-y-0"
+        : "opacity-0 translate-y-10"
         }`}
       style={{ transitionDelay: `${index * 100}ms` }}
       onMouseEnter={() => setIsHovered(true)}

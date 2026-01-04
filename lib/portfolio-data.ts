@@ -4,13 +4,13 @@ export const initialPortfolioData: PortfolioData = {
   about: {
     name: "Alex Rivera",
     title: "Full-Stack Engineer & Creative Developer",
-    bio: "I craft exceptional digital experiences through code, design, and innovation. Specializing in modern web technologies with a passion for building products that make a difference.",
-    location: "San Francisco, CA",
-    email: "alex@example.com",
-    profileImage: "/placeholder-user.jpg",
-    github: "alexrivera",
-    linkedin: "alexrivera",
-    twitter: "alexrivera",
+    bio: "Building scalable AI systems, RAG pipelines, and agentic workflows. I bridge the gap between complex research and high-performance production applications.",
+    location: "Bangalore, India",
+    email: "praveenmirji866@email.com",
+    profileImage: "/placeholder-user.jpg", // Kept placeholder as user didn't provide new image
+    github: "Praveen-MIRJI",
+    linkedin: "praveen-suresh-mirji",
+    twitter: "", // Removed as not requested
   },
   projects: [
     {
@@ -214,4 +214,5 @@ export const initialPortfolioData: PortfolioData = {
       current: false,
     },
   ],
+  achievements: [],
 }

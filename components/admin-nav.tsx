@@ -16,6 +16,7 @@ import {
   Inbox,
   Wrench,
   LogOut,
+  Trophy,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
@@ -60,6 +61,11 @@ const navItems = [
     title: "Experience",
     href: "/admin/experience",
     icon: Briefcase,
+  },
+  {
+    title: "Achievements",
+    href: "/admin/achievements",
+    icon: Trophy,
   },
   {
     title: "Settings",

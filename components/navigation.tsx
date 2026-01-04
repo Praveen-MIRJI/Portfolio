@@ -4,11 +4,13 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
-import { ThemeToggle } from "./theme-toggle"
+// ThemeToggle removed
+
 
 const navLinks = [
   { href: "#services", label: "Services" },
   { href: "#projects", label: "Projects" },
+  { href: "#achievements", label: "Achievements" },
   { href: "#skills", label: "Skills" },
   { href: "#experience", label: "Experience" },
   { href: "#contact", label: "Contact" },
@@ -46,7 +48,7 @@ export function Navigation() {
                 {link.label}
               </a>
             ))}
-            <ThemeToggle />
+            {/* ThemeToggle removed */}
             <Button size="sm" className="rounded-full" asChild>
               <Link href="/admin">Admin</Link>
             </Button>
@@ -54,7 +56,7 @@ export function Navigation() {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
-            <ThemeToggle />
+            {/* ThemeToggle removed */}
             <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>

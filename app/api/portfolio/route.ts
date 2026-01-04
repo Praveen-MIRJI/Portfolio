@@ -47,15 +47,28 @@ function convertExperience(data: any[]) {
   }))
 }
 
+// Convert achievements from DB to frontend
+function convertAchievements(data: any[]) {
+  return data.map(a => ({
+    id: a.id,
+    title: a.title,
+    description: a.description,
+    image: a.image,
+    date: a.date,
+    credentialUrl: a.credential_url,
+  }))
+}
+
 export async function GET() {
   try {
-    const [aboutRes, projectsRes, skillsRes, skillCategoriesRes, servicesRes, experienceRes] = await Promise.all([
+    const [aboutRes, projectsRes, skillsRes, skillCategoriesRes, servicesRes, experienceRes, achievementsRes] = await Promise.all([
       supabase.from("about").select("*").single(),
       supabase.from("projects").select("*").order("year", { ascending: false }),
       supabase.from("skills").select("*").order("level", { ascending: false }),
       supabase.from("skill_categories").select("*").order("created_at", { ascending: true }),
       supabase.from("services").select("*").order("created_at", { ascending: true }),
       supabase.from("experience").select("*").order("current", { ascending: false }),
+      supabase.from("achievements").select("*").order("date", { ascending: false }),
     ])
 
     return NextResponse.json({
@@ -65,6 +78,7 @@ export async function GET() {
       skillCategories: skillCategoriesRes.data || [],
       services: servicesRes.data || [],
       experience: convertExperience(experienceRes.data || []),
+      achievements: convertAchievements(achievementsRes.data || []),
     })
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch portfolio data" }, { status: 500 })

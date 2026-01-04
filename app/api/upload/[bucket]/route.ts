@@ -6,7 +6,8 @@ const allowedBuckets = [
   "project-images",
   "experience-images",
   "service-images",
-  "general-images"
+  "general-images",
+  "achievement-images"
 ]
 
 export async function POST(
