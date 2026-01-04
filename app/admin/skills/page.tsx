@@ -14,34 +14,33 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import {
-  Plus, Edit, Trash2, Code2, Database, Wrench, Palette, Globe, Server,
-  GitBranch, Figma, Layers, Cpu, Cloud, Terminal, Smartphone, Boxes,
-  FileCode, Braces, Hash, Workflow, Container, Sparkles, Loader2,
-  Brain, Bot, MessageSquare
+  Plus, Edit, Trash2, X, Brain, Globe, Workflow, BarChart3,
+  Code2, Database, Server, Cloud, Terminal, Cpu, Container, 
+  GitBranch, Smartphone, Palette, Sparkles, Loader2
 } from "lucide-react"
-import type { Skill } from "@/lib/types"
+import type { SkillCategory } from "@/lib/types"
 import type { LucideIcon } from "lucide-react"
 
 const iconOptions = [
+  { name: "brain", icon: Brain, label: "Brain (AI/ML)" },
+  { name: "globe", icon: Globe, label: "Globe (Web)" },
+  { name: "workflow", icon: Workflow, label: "Workflow (Automation)" },
+  { name: "bar-chart", icon: BarChart3, label: "Chart (Data Science)" },
   { name: "code", icon: Code2, label: "Code" },
-  { name: "terminal", icon: Terminal, label: "Terminal" },
-  { name: "brain", icon: Brain, label: "Brain" },
-  { name: "cpu", icon: Cpu, label: "CPU" },
-  { name: "bot", icon: Bot, label: "Bot" },
-  { name: "message-square", icon: MessageSquare, label: "Message" },
-  { name: "git", icon: GitBranch, label: "Git" },
-  { name: "workflow", icon: Workflow, label: "Workflow" },
   { name: "database", icon: Database, label: "Database" },
   { name: "server", icon: Server, label: "Server" },
-  { name: "globe", icon: Globe, label: "Globe" },
   { name: "cloud", icon: Cloud, label: "Cloud" },
+  { name: "terminal", icon: Terminal, label: "Terminal" },
+  { name: "cpu", icon: Cpu, label: "CPU" },
   { name: "container", icon: Container, label: "Container" },
+  { name: "git", icon: GitBranch, label: "Git" },
+  { name: "smartphone", icon: Smartphone, label: "Mobile" },
+  { name: "palette", icon: Palette, label: "Design" },
   { name: "sparkles", icon: Sparkles, label: "Sparkles" },
 ]
 
@@ -50,65 +49,42 @@ const iconMap: Record<string, LucideIcon> = Object.fromEntries(
 )
 
 export default function SkillsPage() {
-  const { data } = usePortfolio()
+  const { data, saveSkillCategory, deleteSkillCategory } = usePortfolio()
   const { toast } = useToast()
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingSkill, setEditingSkill] = useState<Skill | null>(null)
+  const [editingCategory, setEditingCategory] = useState<SkillCategory | null>(null)
+  const [newSkill, setNewSkill] = useState("")
   const [saving, setSaving] = useState(false)
 
-  const emptySkill: Omit<Skill, "id"> = {
-    name: "",
-    category: "backend",
-    level: 80,
-    icon: "code",
+  const emptyCategory: Omit<SkillCategory, "id"> = {
+    key: "ai-ml",
+    title: "",
+    description: "",
+    icon: "brain",
+    skills: [],
   }
 
-  const [formData, setFormData] = useState<Omit<Skill, "id">>(emptySkill)
-
-  const saveSkill = async (skill: Skill, isNew: boolean) => {
-    const method = isNew ? "POST" : "PUT"
-    const url = isNew ? "/api/skills" : `/api/skills/${skill.id}`
-    
-    const response = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(skill),
-    })
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.details || errorData.error || "Failed to save skill")
-    }
-    
-    return await response.json()
-  }
-
-  const deleteSkill = async (id: string) => {
-    const response = await fetch(`/api/skills/${id}`, { method: "DELETE" })
-    if (!response.ok) throw new Error("Failed to delete skill")
-  }
+  const [formData, setFormData] = useState<Omit<SkillCategory, "id">>(emptyCategory)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
 
     try {
-      if (editingSkill) {
-        await saveSkill({ ...formData, id: editingSkill.id }, false)
-        toast({ title: "Skill updated successfully" })
+      if (editingCategory) {
+        await saveSkillCategory({ ...formData, id: editingCategory.id }, false)
+        toast({ title: "Category updated successfully" })
       } else {
-        await saveSkill({ ...formData, id: "" } as Skill, true)
-        toast({ title: "Skill added successfully" })
+        await saveSkillCategory({ ...formData, id: "" } as SkillCategory, true)
+        toast({ title: "Category added successfully" })
       }
 
       setDialogOpen(false)
-      setEditingSkill(null)
-      setFormData(emptySkill)
-      // Refresh the page to show updated data
-      window.location.reload()
+      setEditingCategory(null)
+      setFormData(emptyCategory)
     } catch (error: any) {
       toast({ 
-        title: "Failed to save skill", 
+        title: "Failed to save category", 
         description: error.message,
         variant: "destructive" 
       })
@@ -117,21 +93,19 @@ export default function SkillsPage() {
     }
   }
 
-  const handleEdit = (skill: Skill) => {
-    setEditingSkill(skill)
-    setFormData(skill)
+  const handleEdit = (category: SkillCategory) => {
+    setEditingCategory(category)
+    setFormData(category)
     setDialogOpen(true)
   }
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteSkill(id)
-      toast({ title: "Skill deleted successfully" })
-      // Refresh the page to show updated data
-      window.location.reload()
+      await deleteSkillCategory(id)
+      toast({ title: "Category deleted successfully" })
     } catch (error: any) {
       toast({ 
-        title: "Failed to delete skill", 
+        title: "Failed to delete category", 
         description: error.message,
         variant: "destructive" 
       })
@@ -139,85 +113,79 @@ export default function SkillsPage() {
   }
 
   const handleAddNew = () => {
-    setEditingSkill(null)
-    setFormData(emptySkill)
+    setEditingCategory(null)
+    setFormData(emptyCategory)
     setDialogOpen(true)
+  }
+
+  const addSkill = () => {
+    if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
+      setFormData({ ...formData, skills: [...formData.skills, newSkill.trim()] })
+      setNewSkill("")
+    }
+  }
+
+  const removeSkill = (skillToRemove: string) => {
+    setFormData({ 
+      ...formData, 
+      skills: formData.skills.filter(s => s !== skillToRemove) 
+    })
   }
 
   const getIcon = (iconName?: string): LucideIcon => {
     return iconMap[iconName || "sparkles"] || Sparkles
   }
 
-  const skills = data.skills || []
+  const categories = data.skillCategories || []
 
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight">Skills</h1>
-          <p className="text-muted-foreground mt-2">Manage your individual skills and proficiency levels</p>
+          <h1 className="text-4xl font-bold tracking-tight">Strategic Skills</h1>
+          <p className="text-muted-foreground mt-2">Manage your core competency areas and technologies</p>
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={handleAddNew} className="gap-2">
               <Plus className="w-4 h-4" />
-              Add Skill
+              Add Category
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingSkill ? "Edit Skill" : "Add New Skill"}</DialogTitle>
-              <DialogDescription>Configure your skill details</DialogDescription>
+              <DialogTitle>{editingCategory ? "Edit Skill Category" : "Add New Skill Category"}</DialogTitle>
+              <DialogDescription>Configure your strategic skill area</DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Skill Name</Label>
+                <Label htmlFor="title">Category Title</Label>
                 <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., Python, Machine Learning"
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="e.g., AI & Machine Learning"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Select 
-                  value={formData.category} 
-                  onValueChange={(value: "frontend" | "backend" | "tools" | "design") => 
-                    setFormData({ ...formData, category: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="backend">Backend/AI-ML</SelectItem>
-                    <SelectItem value="tools">Tools</SelectItem>
-                    <SelectItem value="frontend">Frontend</SelectItem>
-                    <SelectItem value="design">Design</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Proficiency Level: {formData.level}%</Label>
-                <Slider
-                  value={[formData.level]}
-                  onValueChange={(value) => setFormData({ ...formData, level: value[0] })}
-                  max={100}
-                  min={0}
-                  step={5}
-                  className="w-full"
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Describe this skill category and its strategic importance..."
+                  rows={3}
+                  required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label>Icon</Label>
-                <div className="grid grid-cols-7 gap-2 p-3 border rounded-lg max-h-32 overflow-y-auto">
+                <div className="grid grid-cols-5 gap-3 p-4 border rounded-lg max-h-40 overflow-y-auto">
                   {iconOptions.map((opt) => {
                     const Icon = opt.icon
                     const isSelected = formData.icon === opt.name
@@ -226,88 +194,130 @@ export default function SkillsPage() {
                         key={opt.name}
                         type="button"
                         onClick={() => setFormData({ ...formData, icon: opt.name })}
-                        className={`p-2 rounded-lg flex items-center justify-center transition-colors ${
+                        className={`p-3 rounded-lg flex flex-col items-center gap-2 transition-colors ${
                           isSelected
                             ? "bg-primary text-primary-foreground"
                             : "hover:bg-muted"
                         }`}
                         title={opt.label}
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="w-6 h-6" />
+                        <span className="text-xs text-center">{opt.label.split(' ')[0]}</span>
                       </button>
                     )
                   })}
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label>Technologies & Skills</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    placeholder="Add a technology or skill..."
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault()
+                        addSkill()
+                      }
+                    }}
+                  />
+                  <Button type="button" onClick={addSkill} variant="outline">
+                    Add
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-3 min-h-[60px] p-3 border rounded-lg bg-muted/30">
+                  {formData.skills.length === 0 ? (
+                    <p className="text-sm text-muted-foreground italic">No technologies added yet</p>
+                  ) : (
+                    formData.skills.map((skill, index) => (
+                      <Badge key={index} variant="secondary" className="gap-1 pr-1 py-1">
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => removeSkill(skill)}
+                          className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))
+                  )}
+                </div>
+              </div>
+
               <Button type="submit" className="w-full" disabled={saving}>
                 {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {editingSkill ? "Update Skill" : "Add Skill"}
+                {editingCategory ? "Update Category" : "Add Category"}
               </Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      {skills.length === 0 ? (
+      {categories.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center">
-            <Sparkles className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No skills yet. Add your first one!</p>
+          <CardContent className="py-16 text-center">
+            <Brain className="w-16 h-16 mx-auto text-muted-foreground mb-6" />
+            <h3 className="text-xl font-semibold mb-2">No skill categories yet</h3>
+            <p className="text-muted-foreground mb-6">Create your first strategic skill category to showcase your expertise</p>
+            <Button onClick={handleAddNew} className="gap-2">
+              <Plus className="w-4 h-4" />
+              Add Your First Category
+            </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skills.map((skill) => {
-            const Icon = getIcon(skill.icon)
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {categories.map((category) => {
+            const Icon = getIcon(category.icon)
             
             return (
-              <Card key={skill.id} className="group hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10">
-                        <Icon className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold">{skill.name}</h3>
-                        <Badge variant="secondary" className="text-xs mt-1">
-                          {skill.category === 'backend' ? 'AI/ML' : skill.category}
+              <Card key={category.id} className="group hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-8">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-primary/10 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                      <Icon className="w-8 h-8 text-primary group-hover:text-primary-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-2xl mb-2">{category.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {category.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-muted-foreground">Technologies ({category.skills.length})</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {category.skills.map((skill, index) => (
+                        <Badge key={index} variant="secondary" className="text-sm py-1 px-3">
+                          {skill}
                         </Badge>
-                      </div>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Proficiency</span>
-                      <span className="text-sm font-medium">{skill.level}%</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div 
-                        className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-300"
-                        style={{ width: `${skill.level}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-3 mt-8 pt-6 border-t opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <Button
                       size="sm"
                       variant="outline"
                       className="flex-1"
-                      onClick={() => handleEdit(skill)}
+                      onClick={() => handleEdit(category)}
                     >
-                      <Edit className="w-3 h-3 mr-1" />
-                      Edit
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit Category
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
                       className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                      onClick={() => handleDelete(skill.id)}
+                      onClick={() => handleDelete(category.id)}
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </CardContent>
