@@ -61,16 +61,20 @@ export async function deleteImageFromStorage(imageUrl: string, bucket: string): 
 
 /**
  * Determines the appropriate bucket name based on the context
- * @param context - The context (e.g., 'projects', 'achievements', 'experience', etc.)
+ * @param context - The context (e.g., 'projects', 'achievements', 'services', 'experience', etc.)
  * @returns The bucket name
  */
 export function getBucketName(context: string): string {
   const bucketMap: Record<string, string> = {
     'projects': 'project-images',
     'achievements': 'achievement-images',
+    'services': 'service-images',
     'experience': 'experience-images',
     'about': 'profile-image',
     'profile': 'profile-image',
+    'skills': 'general-images',
+    'skill-categories': 'general-images',
+    'general': 'general-images',
   }
   
   return bucketMap[context] || 'general-images'
