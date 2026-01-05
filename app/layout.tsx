@@ -18,25 +18,12 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Alex Rivera - Full-Stack Engineer & Creative Developer",
+  title: "Praveen Mirji",
   description: "Portfolio showcasing innovative web applications, AI-powered tools, and modern development expertise",
   generator: "v0.app",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/ai-icon.svg",
+    apple: "/ai-icon.svg",
   },
 }
 

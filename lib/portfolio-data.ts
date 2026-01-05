@@ -2,7 +2,7 @@ import type { PortfolioData } from "./types"
 
 export const initialPortfolioData: PortfolioData = {
   about: {
-    name: "Alex Rivera",
+    name: "Praveen Mirji",
     title: "Full-Stack Engineer & Creative Developer",
     bio: "Building scalable AI systems, RAG pipelines, and agentic workflows. I bridge the gap between complex research and high-performance production applications.",
     location: "Bangalore, India",
