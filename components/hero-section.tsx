@@ -141,7 +141,7 @@ export function HeroSection() {
           </div>
 
           {/* Right Content - Profile Image */}
-          <div className="lg:col-span-2 flex items-center justify-center">
+          <div className="lg:col-span-2 flex items-center justify-center lg:mt-16">
             <div className="relative">
               {/* Gradient border frame */}
               <div className="absolute -inset-1 rounded-[1.75rem] bg-gradient-to-br from-primary via-accent to-primary opacity-75" />
@@ -150,7 +150,7 @@ export function HeroSection() {
               <div className="absolute -inset-0.5 rounded-[1.6rem] bg-background" />
 
               {/* Image */}
-              <div className="relative w-64 h-80 md:w-80 md:h-[31rem] lg:w-96 lg:h-[38rem] rounded-[1.5rem] overflow-hidden shadow-xl">
+              <div className="relative w-64 h-72 md:w-80 md:h-[28rem] lg:w-96 lg:h-[34rem] rounded-[1.5rem] overflow-hidden shadow-xl">
                 <Image
                   src={about.profileImage || "/placeholder-user.jpg"}
                   alt={about.name}
