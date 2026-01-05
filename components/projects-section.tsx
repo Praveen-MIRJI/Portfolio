@@ -8,11 +8,22 @@ import { ExternalLink, ArrowUpRight, Sparkles } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { ProjectDetailModal } from "./project-detail-modal"
+
 
 export function ProjectsSection() {
   const { data } = usePortfolio()
+  const [selectedProject, setSelectedProject] = useState<any>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleMore = (project: any) => {
+    setSelectedProject(project)
+    setIsModalOpen(true)
+  }
+
   const featuredProjects = data.projects.filter((p) => p.featured)
   const otherProjects = data.projects.filter((p) => !p.featured)
+
 
   return (
     <section id="projects" className="py-24 px-4 relative overflow-hidden">
@@ -40,8 +51,10 @@ export function ProjectsSection() {
             <FeaturedProjectCard
               key={project.id}
               project={project}
+              onMore={() => handleMore(project)}
             />
           ))}
+
         </div>
 
         {/* Other Projects */}
@@ -53,12 +66,24 @@ export function ProjectsSection() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {otherProjects.map((project) => (
-                <OtherProjectCard key={project.id} project={project} />
+                <OtherProjectCard
+                  key={project.id}
+                  project={project}
+                  onMore={() => handleMore(project)}
+                />
               ))}
+
             </div>
           </div>
         )}
+
+        <ProjectDetailModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          project={selectedProject}
+        />
       </div>
+
     </section>
   )
 }
@@ -75,9 +100,12 @@ interface ProjectProps {
     githubUrl?: string
     year: string
   }
+  onMore: () => void
 }
 
-function FeaturedProjectCard({ project }: ProjectProps) {
+
+function FeaturedProjectCard({ project, onMore }: ProjectProps) {
+
   const [isHovered, setIsHovered] = useState(false)
 
   return (
@@ -160,6 +188,17 @@ function FeaturedProjectCard({ project }: ProjectProps) {
               {project.longDescription}
             </p>
 
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-0 text-primary hover:text-primary/80 h-auto font-semibold gap-1 group/btn"
+              onClick={onMore}
+            >
+              Learn More
+              <ArrowUpRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
+            </Button>
+
+
             {/* Tags - Hidden on mobile */}
             <div className="hidden md:flex flex-wrap gap-2 pt-2">
               {project.tags.map((tag) => (
@@ -185,7 +224,8 @@ function FeaturedProjectCard({ project }: ProjectProps) {
   )
 }
 
-function OtherProjectCard({ project }: ProjectProps) {
+function OtherProjectCard({ project, onMore }: ProjectProps) {
+
   const [isHovered, setIsHovered] = useState(false)
 
   return (
@@ -258,6 +298,10 @@ function OtherProjectCard({ project }: ProjectProps) {
                 </Link>
               </Button>
             )}
+            <Button size="sm" variant="ghost" className="h-8 text-xs font-semibold hover:bg-primary/10 hover:text-primary" onClick={onMore}>
+              More Info
+            </Button>
+
           </div>
         </div>
       </div>

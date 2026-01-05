@@ -9,9 +9,18 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import type { Achievement } from "@/lib/types"
+import { AchievementDetailModal } from "./achievement-detail-modal"
 
 export function AchievementsSection() {
     const { data } = usePortfolio()
+    const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const handleMore = (achievement: Achievement) => {
+        setSelectedAchievement(achievement)
+        setIsModalOpen(true)
+    }
+
     const achievements = data.achievements || []
 
     if (achievements.length === 0) return null
@@ -39,15 +48,25 @@ export function AchievementsSection() {
                 {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                     {achievements.map((achievement) => (
-                        <AchievementCard key={achievement.id} achievement={achievement} />
+                        <AchievementCard
+                            key={achievement.id}
+                            achievement={achievement}
+                            onMore={() => handleMore(achievement)}
+                        />
                     ))}
                 </div>
+
+                <AchievementDetailModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    achievement={selectedAchievement}
+                />
             </div>
         </section>
     )
 }
 
-function AchievementCard({ achievement }: { achievement: Achievement }) {
+function AchievementCard({ achievement, onMore }: { achievement: Achievement, onMore: () => void }) {
     const [isHovered, setIsHovered] = useState(false)
 
     return (
@@ -96,8 +115,8 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
                         </p>
                     </div>
 
-                    {achievement.credentialUrl && (
-                        <div className="pt-4 border-t border-border/50">
+                    <div className="flex flex-col gap-2 pt-4 border-t border-border/50">
+                        {achievement.credentialUrl && (
                             <Button size="sm" variant="ghost" className="w-full gap-2 hover:bg-primary/20 hover:text-primary transition-colors justify-start pl-0" asChild>
                                 <Link href={achievement.credentialUrl} target="_blank">
                                     <Award className="w-4 h-4" />
@@ -105,8 +124,18 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
                                     <ExternalLink className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </Link>
                             </Button>
-                        </div>
-                    )}
+                        )}
+
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            className="w-full gap-2 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors text-xs font-semibold justify-start pl-0"
+                            onClick={onMore}
+                        >
+                            <Trophy className="w-4 h-4" />
+                            More Details
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>
